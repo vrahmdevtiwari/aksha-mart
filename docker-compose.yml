@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: aksha_mart_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: aksha_mart_db
+      POSTGRES_INITDB_ARGS: '--encoding=UTF8'
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aksha_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: aksha_mart_redis
+    command: redis-server --appendonly yes --requirepass redis123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aksha_network
+
+  # ElasticSearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.0
+    container_name: aksha_mart_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - xpack.security.enrollment.enabled=true
+      - ELASTIC_PASSWORD=changeme
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://elastic:changeme@localhost:9200 >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - aksha_network
+
+  # Kibana for ElasticSearch visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.5.0
+    container_name: aksha_mart_kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=changeme
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - aksha_network
+
+  # Mailhog for email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: aksha_mart_mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - aksha_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  elasticsearch_data:
+
+networks:
+  aksha_network:
+    driver: bridge

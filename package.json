@@ -1,0 +1,45 @@
+{
+  "name": "aksha-mart",
+  "version": "1.0.0",
+  "description": "Enterprise-grade ecommerce platform - Rooted in India, Loved Worldwide",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --parallel",
+    "dev:frontend": "npm run dev -w packages/frontend",
+    "dev:backend": "npm run dev -w packages/backend",
+    "dev:admin": "npm run dev -w packages/admin",
+    "build": "npm run build --workspaces",
+    "build:frontend": "npm run build -w packages/frontend",
+    "build:backend": "npm run build -w packages/backend",
+    "build:admin": "npm run build -w packages/admin",
+    "start": "npm start --workspaces",
+    "start:backend": "npm start -w packages/backend",
+    "start:frontend": "npm start -w packages/frontend",
+    "test": "npm run test --workspaces",
+    "test:unit": "npm run test:unit --workspaces",
+    "test:e2e": "npm run test:e2e --workspaces",
+    "test:coverage": "npm run test:coverage --workspaces",
+    "lint": "npm run lint --workspaces",
+    "format": "npm run format --workspaces",
+    "type-check": "npm run type-check --workspaces",
+    "db:migrate": "npm run db:migrate -w packages/backend",
+    "db:seed": "npm run db:seed -w packages/backend",
+    "db:reset": "npm run db:reset -w packages/backend",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:push": "docker-compose push"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}
